@@ -742,9 +742,11 @@ const API_URL = "https://api.thecatapi.com/v1";
  *  - Each option should have a value attribute equal to the id of the breed.
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
- */ async function initialLoad() {
+ */ let catData = []; // stored for infoDump
+async function initialLoad() {
     const response = await fetch(API_URL + "/breeds");
     const jsonData = await response.json();
+    catData = jsonData;
     jsonData.forEach((breed)=>{
         const option = document.createElement("option");
         option.value = breed.id;
@@ -777,6 +779,14 @@ initialLoad();
         _carouselJs.appendCarousel(item);
     });
     _carouselJs.start();
+    while(infoDump.firstChild)infoDump.removeChild(infoDump.firstChild);
+    const infoObj = catData.find((item)=>item.id === breedId);
+    const title = document.createElement("h2");
+    title.textContent = infoObj.name;
+    const desc = document.createElement("p");
+    desc.textContent = infoObj.description;
+    infoDump.appendChild(title);
+    infoDump.appendChild(desc);
 });
 async function favourite(imgId) {
 // your code here

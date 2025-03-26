@@ -23,9 +23,14 @@ const API_URL = "https://api.thecatapi.com/v1";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+
+let catData = []; // stored for infoDump
+
 async function initialLoad() {
   const response = await fetch(API_URL + "/breeds");
   const jsonData = await response.json();
+
+  catData = jsonData;
 
   jsonData.forEach((breed) => {
     const option = document.createElement("option");
@@ -67,6 +72,18 @@ breedSelect.addEventListener("change", async (e) => {
     Carousel.appendCarousel(item);
   });
   Carousel.start();
+
+  while (infoDump.firstChild) {
+    infoDump.removeChild(infoDump.firstChild);
+  }
+
+  const infoObj = catData.find((item) => item.id === breedId);
+  const title = document.createElement("h2");
+  title.textContent = infoObj.name;
+  const desc = document.createElement("p");
+  desc.textContent = infoObj.description;
+  infoDump.appendChild(title);
+  infoDump.appendChild(desc);
 });
 
 /**
@@ -82,6 +99,7 @@ breedSelect.addEventListener("change", async (e) => {
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
