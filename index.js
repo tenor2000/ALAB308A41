@@ -1,4 +1,4 @@
-// import * as Carousel from "./Carousel.js";
+import * as Carousel from "./Carousel.js";
 // import axios from "axios";
 
 // The breed selection input element.
@@ -13,6 +13,8 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY = "";
 
+const API_URL = "https://api.thecatapi.com/v1";
+
 /**
  * 1. Create an async function "initialLoad" that does the following:
  * - Retrieve a list of breeds from the cat API using fetch().
@@ -22,7 +24,7 @@ const API_KEY = "";
  * This function should execute immediately.
  */
 async function initialLoad() {
-  const response = await fetch("https://api.thecatapi.com/v1/breeds");
+  const response = await fetch(API_URL + "/breeds");
   const jsonData = await response.json();
 
   jsonData.forEach((breed) => {
@@ -50,9 +52,27 @@ initialLoad();
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
+breedSelect.addEventListener("change", async (e) => {
+  const breedId = e.target.value;
+
+  const response = await fetch(
+    API_URL + `/images/search?limit=10&breed_ids=${breedId}`
+  );
+  const jsonData = await response.json();
+
+  console.log(jsonData);
+  Carousel.clear();
+  jsonData.forEach((image) => {
+    const item = Carousel.createCarouselItem(image.url, "cat", image.id);
+    Carousel.appendCarousel(item);
+  });
+  Carousel.start();
+});
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
+
 /**
  * 4. Change all of your fetch() functions to axios!
  * - axios has already been imported for you within index.js.
