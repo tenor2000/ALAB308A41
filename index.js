@@ -1,5 +1,5 @@
 import * as Carousel from "./Carousel.js";
-// import axios from "axios";
+import axios from "axios";
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -24,6 +24,7 @@ const API_URL = "https://api.thecatapi.com/v1";
  * This function should execute immediately.
  */
 
+/*
 let catData = []; // stored for infoDump
 
 async function initialLoad() {
@@ -42,6 +43,9 @@ async function initialLoad() {
 
 initialLoad();
 
+
+*/
+
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -57,6 +61,7 @@ initialLoad();
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
+/*
 breedSelect.addEventListener("change", async (e) => {
   const breedId = e.target.value;
 
@@ -86,6 +91,8 @@ breedSelect.addEventListener("change", async (e) => {
   infoDump.appendChild(desc);
 });
 
+*/
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
@@ -99,6 +106,57 @@ breedSelect.addEventListener("change", async (e) => {
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+
+let catData = [];
+
+async function initialLoad() {
+  const response = await axios.get(API_URL + "/breeds", {
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+  });
+
+  catData = response.data;
+
+  catData.forEach((breed) => {
+    const option = document.createElement("option");
+    option.value = breed.id;
+    option.textContent = breed.name;
+    breedSelect.appendChild(option);
+  });
+}
+
+initialLoad();
+
+breedSelect.addEventListener("change", async (e) => {
+  const breedId = e.target.value;
+
+  const response = await axios.get(
+    API_URL + `/images/search?limit=10&breed_ids=${breedId}`,
+    {
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+    }
+  );
+  const jsonData = response.data;
+
+  console.log(jsonData);
+  Carousel.clear();
+  jsonData.forEach((image) => {
+    const item = Carousel.createCarouselItem(image.url, "cat", image.id);
+    Carousel.appendCarousel(item);
+  });
+  Carousel.start();
+
+  while (infoDump.firstChild) {
+    infoDump.removeChild(infoDump.firstChild);
+  }
+
+  const infoObj = catData.find((item) => item.id === breedId);
+  const title = document.createElement("h2");
+  title.textContent = infoObj.name;
+  const desc = document.createElement("p");
+  desc.textContent = infoObj.description;
+  infoDump.appendChild(title);
+  infoDump.appendChild(desc);
+});
 
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
