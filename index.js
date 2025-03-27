@@ -124,7 +124,7 @@ async function initialLoad() {
   });
 }
 
-initialLoad();
+// initialLoad();
 
 breedSelect.addEventListener("change", async (e) => {
   const breedId = e.target.value;
@@ -137,7 +137,6 @@ breedSelect.addEventListener("change", async (e) => {
   );
   const jsonData = response.data;
 
-  console.log(jsonData);
   Carousel.clear();
   jsonData.forEach((image) => {
     const item = Carousel.createCarouselItem(image.url, "cat", image.id);
@@ -164,6 +163,25 @@ breedSelect.addEventListener("change", async (e) => {
  * - Add a console.log statement to indicate when requests begin.
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
+
+axios.interceptors.request.use((request) => {
+  console.log("Request sent.");
+  console.time("Request/Response time");
+  return request;
+});
+
+axios.interceptors.response.use(
+  (response) => {
+    console.log("Successful response!");
+    console.timeEnd("Request/Response time");
+    return response;
+  },
+  (error) => {
+    console.log("Unsuccesful response...");
+  }
+);
+
+initialLoad();
 
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
