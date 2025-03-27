@@ -1,5 +1,8 @@
 import * as Carousel from "./Carousel.js";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -11,7 +14,7 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY = process.env.API_KEY;
 
 const API_URL = "https://api.thecatapi.com/v1";
 
@@ -215,6 +218,9 @@ function updateProgress(progressEvent) {
  * - In your request interceptor, set the body element's cursor style to "progress."
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
+
+//done
+
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
@@ -227,7 +233,7 @@ function updateProgress(progressEvent) {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  // your code here
+  const response = await axios.post(API_URL + "/favourites");
 }
 
 /**
