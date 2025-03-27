@@ -132,7 +132,9 @@ breedSelect.addEventListener("change", async (e) => {
   const response = await axios.get(
     API_URL + `/images/search?limit=10&breed_ids=${breedId}`,
     {
-      headers: { "Content-type": "application/json; charset=UTF-8" },
+      onDownloadProgress: (progressEvent) => {
+        updateProgress(progressEvent);
+      },
     }
   );
   const jsonData = response.data;
@@ -165,6 +167,7 @@ breedSelect.addEventListener("change", async (e) => {
  */
 
 axios.interceptors.request.use((request) => {
+  progressBar.style.width = "0%";
   console.log("Request sent.");
   console.time("Request/Response time");
   return request;
@@ -178,6 +181,7 @@ axios.interceptors.response.use(
   },
   (error) => {
     console.log("Unsuccesful response...");
+    throw error;
   }
 );
 
@@ -198,6 +202,11 @@ initialLoad();
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
+
+function updateProgress(progressEvent) {
+  const percentage = (progressEvent.loaded / progressEvent.total) * 100;
+  progressBar.style.width = `${percentage}%`;
+}
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
