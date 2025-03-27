@@ -168,6 +168,7 @@ breedSelect.addEventListener("change", async (e) => {
 
 axios.interceptors.request.use((request) => {
   progressBar.style.width = "0%";
+  document.body.style.cursor = "progress";
   console.log("Request sent.");
   console.time("Request/Response time");
   return request;
@@ -175,6 +176,7 @@ axios.interceptors.request.use((request) => {
 
 axios.interceptors.response.use(
   (response) => {
+    document.body.style.cursor = "";
     console.log("Successful response!");
     console.timeEnd("Request/Response time");
     return response;
