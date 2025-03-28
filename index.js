@@ -127,8 +127,6 @@ async function initialLoad() {
   });
 }
 
-// initialLoad();
-
 breedSelect.addEventListener("change", async (e) => {
   const breedId = e.target.value;
 
@@ -141,18 +139,26 @@ breedSelect.addEventListener("change", async (e) => {
     }
   );
   const jsonData = response.data;
+  const warn = document.createElement("h1");
+  warn.style.color = "red";
 
   Carousel.clear();
-  jsonData.forEach((image) => {
-    const item = Carousel.createCarouselItem(image.url, "cat", image.id);
-    Carousel.appendCarousel(item);
-  });
+  if (jsonData.length > 0) {
+    jsonData.forEach((image) => {
+      const item = Carousel.createCarouselItem(image.url, "cat", image.id);
+      Carousel.appendCarousel(item);
+    });
+  } else {
+    warn.textContent = "There has never been a sighting of this cat.";
+  }
   Carousel.start();
 
   while (infoDump.firstChild) {
     infoDump.removeChild(infoDump.firstChild);
   }
-
+  if (warn.textContent) {
+    infoDump.appendChild(warn);
+  }
   const infoObj = catData.find((item) => item.id === breedId);
   const title = document.createElement("h2");
   title.textContent = infoObj.name;
@@ -218,9 +224,6 @@ function updateProgress(progressEvent) {
  * - In your request interceptor, set the body element's cursor style to "progress."
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
-
-//done
-
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
@@ -233,9 +236,45 @@ function updateProgress(progressEvent) {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  const response = await axios.post(API_URL + "/favourites");
-}
+  const userIDexample = "user-123";
 
+  const getResponse = await axios.get(
+    API_URL + `/favourites?sub_id=${userIDexample}`,
+    {
+      headers: { "x-api-key": API_KEY, "Content-Type": "application/json" },
+    }
+  );
+
+  const targetObj = getResponse.data.find((obj) => {
+    if (obj.image_id === imgId) {
+      return obj;
+    }
+    return false;
+  });
+
+  if (targetObj) {
+    // console.log("Favorite found");
+    const deleteResponse = await axios.delete(
+      API_URL + `/favourites/${targetObj.id}`,
+      {
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      }
+    );
+    console.log(deleteResponse.data);
+  } else {
+    // console.log("fav not found");
+    const rawBody = JSON.stringify({
+      image_id: imgId,
+      sub_id: userIDexample,
+    });
+    const postResponse = await axios.post(API_URL + "/favourites", rawBody, {
+      headers: { "x-api-key": API_KEY, "Content-Type": "application/json" },
+    });
+    // console.log(getResponse.data);
+  }
+}
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
  * - Use Axios to get all of your favourites from the cat API.
@@ -245,6 +284,36 @@ export async function favourite(imgId) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+
+async function getFavourites() {
+  const userIDexample = "user-123";
+
+  const getResponse = await axios.get(
+    API_URL + `/favourites?sub_id=${userIDexample}`,
+    {
+      headers: { "x-api-key": API_KEY, "Content-Type": "application/json" },
+    }
+  );
+  const jsonData = getResponse.data;
+
+  // CODE is not put in function because 'favourites' endpoint Object is formatted differently than 'image' endpoint
+  Carousel.clear();
+  jsonData.forEach((image) => {
+    const item = Carousel.createCarouselItem(
+      image.image.url,
+      "cat",
+      image.image.id
+    );
+    Carousel.appendCarousel(item);
+  });
+  Carousel.start();
+
+  while (infoDump.firstChild) {
+    infoDump.removeChild(infoDump.firstChild);
+  }
+}
+
+getFavouritesBtn.addEventListener("click", getFavourites);
 
 /**
  * 10. Test your site, thoroughly!
